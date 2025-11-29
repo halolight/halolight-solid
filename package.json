@@ -1,0 +1,62 @@
+{
+  "name": "halolight-solid",
+  "version": "0.1.0",
+  "private": true,
+  "description": "基于 Solid.js + SolidStart 的现代化中文后台管理系统",
+  "author": "h7ml <h7ml@qq.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/halolight/halolight-solid"
+  },
+  "homepage": "https://halolight-solid.h7ml.cn",
+  "bugs": {
+    "url": "https://github.com/halolight/halolight-solid/issues"
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "vinxi dev",
+    "build": "vinxi build",
+    "start": "vinxi start",
+    "preview": "wrangler pages dev dist",
+    "deploy": "wrangler pages deploy dist",
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\"",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@solidjs/meta": "^0.29.4",
+    "@solidjs/router": "^0.15.4",
+    "@solidjs/start": "^1.0.12",
+    "solid-js": "^1.9.4",
+    "vinxi": "^0.5.8"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@solidjs/testing-library": "^0.8.10",
+    "@tailwindcss/vite": "^4.0.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@types/mockjs": "^1.0.10",
+    "@types/node": "^22.10.0",
+    "eslint": "^9.39.1",
+    "eslint-plugin-solid": "^0.14.5",
+    "jsdom": "^27.2.0",
+    "mockjs": "^1.1.0",
+    "prettier": "^3.7.3",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.48.0",
+    "vite-plugin-solid": "^2.11.10",
+    "vitest": "^4.0.14"
+  },
+  "engines": {
+    "node": ">=18",
+    "pnpm": ">=8"
+  },
+  "packageManager": "pnpm@10.23.0"
+}

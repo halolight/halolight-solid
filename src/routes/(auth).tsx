@@ -1,0 +1,11 @@
+import { JSX } from 'solid-js'
+
+export default function AuthLayout(props: { children: JSX.Element }) {
+  return (
+    <>
+      <div class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">{props.children}</div>
+      </div>
+    </>
+  )
+}
