@@ -82,13 +82,10 @@ export default function Login() {
     })
   }
 
-  const handleSocialLogin = (provider: string) => {
-    console.log(`使用 ${provider} 登录`)
-    uiActions.addNotification({
-      type: 'info',
-      title: '功能开发中',
-      message: `${provider} 登录功能即将上线`,
-    })
+  const SOCIAL_LINKS = {
+    github: 'https://github.com/halolight/halolight-solid',
+    google: 'https://halolight-docs.h7ml.cn',
+    wechat: 'https://github.com/halolight',
   }
 
   const features = [
@@ -99,9 +96,9 @@ export default function Login() {
   ]
 
   const socialProviders = [
-    { name: 'github', label: 'GitHub', icon: '🐙' },
-    { name: 'google', label: 'Google', icon: '🔍' },
-    { name: 'wechat', label: '微信', icon: '💬' },
+    { name: 'github', label: 'GitHub', icon: '🐙', href: SOCIAL_LINKS.github },
+    { name: 'google', label: 'Google', icon: '🔍', href: SOCIAL_LINKS.google },
+    { name: 'wechat', label: '微信', icon: '💬', href: SOCIAL_LINKS.wechat },
   ]
 
   return (
@@ -200,13 +197,14 @@ export default function Login() {
                         class={`${mounted() ? 'scale-100 opacity-100' : 'scale-95 opacity-0'} transition-all duration-500`}
                         style={{ 'transition-delay': `${500 + index() * 100}ms` }}
                       >
-                        <Button
-                          variant="outline"
-                          class="w-full h-11 sm:h-12 border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300 group"
-                          onClick={() => handleSocialLogin(provider.name)}
+                        <a
+                          href={provider.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="w-full h-11 sm:h-12 border border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300 group flex items-center justify-center rounded-xl"
                         >
                           <span class="text-xl group-hover:scale-110 transition-transform">{provider.icon}</span>
-                        </Button>
+                        </a>
                       </div>
                     )}
                   </For>

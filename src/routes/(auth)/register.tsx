@@ -10,6 +10,9 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, 
 export default function Register() {
   const navigate = useNavigate()
 
+  // 读取注册开关环境变量，默认关闭
+  const registrationEnabled = import.meta.env.VITE_ENABLE_REGISTRATION === 'true'
+
   const [formData, setFormData] = createSignal<RegisterData>({
     name: '',
     email: '',
@@ -143,13 +146,11 @@ export default function Register() {
     }
   }
 
-  const handleSocialRegister = (provider: string) => {
-    console.log(`使用 ${provider} 注册`)
-    uiActions.addNotification({
-      type: 'info',
-      title: '功能开发中',
-      message: `${provider} 注册功能即将上线`,
-    })
+  // 社交链接映射
+  const SOCIAL_LINKS: Record<string, string> = {
+    github: 'https://github.com/halolight/halolight-solid',
+    google: 'https://halolight-docs.h7ml.cn',
+    wechat: 'https://github.com/halolight',
   }
 
   // 与 Next.js 版本一致的特性列表
@@ -161,9 +162,9 @@ export default function Register() {
   ]
 
   const socialProviders = [
-    { name: 'github', label: 'GitHub', icon: '🐙' },
-    { name: 'google', label: 'Google', icon: '🔍' },
-    { name: 'wechat', label: '微信', icon: '💬' },
+    { name: 'github', label: 'GitHub', icon: '🐙', href: SOCIAL_LINKS.github },
+    { name: 'google', label: 'Google', icon: '🔍', href: SOCIAL_LINKS.google },
+    { name: 'wechat', label: '微信', icon: '💬', href: SOCIAL_LINKS.wechat },
   ]
 
   return (
@@ -254,40 +255,45 @@ export default function Register() {
               </CardHeader>
 
               <CardContent class="space-y-3 sm:space-y-4 px-4 sm:px-6">
-                {/* 社交登录按钮 */}
-                <div class="grid grid-cols-3 gap-2 sm:gap-3">
-                  <For each={socialProviders}>
-                    {(provider, index) => (
-                      <div
-                        class={`${mounted() ? 'scale-100 opacity-100' : 'scale-95 opacity-0'} transition-all duration-500`}
-                        style={{ 'transition-delay': `${500 + index() * 100}ms` }}
-                      >
-                        <Button
-                          variant="outline"
-                          class="w-full h-11 sm:h-12 border-gray-300 dark:border-gray-600 hover:border-purple-500 dark:hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all duration-300 group"
-                          onClick={() => handleSocialRegister(provider.name)}
-                        >
-                          <span class="text-xl group-hover:scale-110 transition-transform">{provider.icon}</span>
-                        </Button>
+                <Show
+                  when={!registrationEnabled}
+                  fallback={
+                    <>
+                      {/* 社交登录按钮 */}
+                      <div class="grid grid-cols-3 gap-2 sm:gap-3">
+                        <For each={socialProviders}>
+                          {(provider, index) => (
+                            <div
+                              class={`${mounted() ? 'scale-100 opacity-100' : 'scale-95 opacity-0'} transition-all duration-500`}
+                              style={{ 'transition-delay': `${500 + index() * 100}ms` }}
+                            >
+                              <a
+                                href={provider.href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="w-full h-11 sm:h-12 border border-gray-300 dark:border-gray-600 hover:border-purple-500 dark:hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all duration-300 group rounded-lg inline-flex items-center justify-center"
+                              >
+                                <span class="text-xl group-hover:scale-110 transition-transform">{provider.icon}</span>
+                              </a>
+                            </div>
+                          )}
+                        </For>
                       </div>
-                    )}
-                  </For>
-                </div>
 
-                {/* 分隔线 */}
-                <div class="relative py-3">
-                  <div class="absolute inset-0 flex items-center">
-                    <div class="w-full border-t border-gray-200 dark:border-gray-700" />
-                  </div>
-                  <div class="relative flex justify-center text-xs uppercase">
-                    <span class="bg-white dark:bg-gray-800 px-3 text-gray-500 dark:text-gray-400 font-medium">
-                      或使用邮箱注册
-                    </span>
-                  </div>
-                </div>
+                      {/* 分隔线 */}
+                      <div class="relative py-3">
+                        <div class="absolute inset-0 flex items-center">
+                          <div class="w-full border-t border-gray-200 dark:border-gray-700" />
+                        </div>
+                        <div class="relative flex justify-center text-xs uppercase">
+                          <span class="bg-white dark:bg-gray-800 px-3 text-gray-500 dark:text-gray-400 font-medium">
+                            或使用邮箱注册
+                          </span>
+                        </div>
+                      </div>
 
-                {/* 注册表单 */}
-                <form onSubmit={handleSubmit} class="space-y-3 sm:space-y-4">
+                      {/* 注册表单 */}
+                      <form onSubmit={handleSubmit} class="space-y-3 sm:space-y-4">
                   {/* 错误提示 */}
                   <Show when={authStore.error}>
                     <div class="p-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-xs sm:text-sm animate-shake">
@@ -591,23 +597,144 @@ export default function Register() {
                     </Show>
                   </Button>
                 </form>
+                    </>
+                  }
+                >
+                  {/* 注册已关闭 UI */}
+                  <div
+                    class={`space-y-6 py-6 ${mounted() ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'} transition-all duration-500`}
+                  >
+                    {/* 主要图标和标题 */}
+                    <div class="flex flex-col items-center justify-center space-y-4">
+                      <div
+                        class={`relative ${mounted() ? 'scale-100' : 'scale-0'} transition-transform duration-500 delay-200`}
+                      >
+                        <div class="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30">
+                          <svg
+                            class="h-10 w-10 text-amber-600 dark:text-amber-500"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                            />
+                          </svg>
+                        </div>
+                        <div class="absolute -inset-2 rounded-full border-2 border-dashed border-amber-300/50 dark:border-amber-700/50 animate-spin-slow" />
+                      </div>
+
+                      <div class="space-y-2 text-center">
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100 sm:text-2xl">注册已关闭</h3>
+                        <p class="max-w-sm text-sm text-gray-600 dark:text-gray-400">
+                          系统管理员已暂时关闭新用户注册功能
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* 信息卡片 */}
+                    <div class="space-y-3">
+                      <div
+                        class={`flex items-start gap-3 rounded-lg border border-gray-200/50 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-800/50 p-4 backdrop-blur-sm transition-colors hover:border-blue-500/20 hover:bg-gray-100/80 dark:hover:bg-gray-700/80 ${mounted() ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-5'} transition-all duration-500 delay-300`}
+                      >
+                        <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30">
+                          <svg
+                            class="h-4 w-4 text-blue-600 dark:text-blue-400"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                            />
+                          </svg>
+                        </div>
+                        <div class="flex-1 space-y-1">
+                          <p class="text-sm font-medium text-gray-900 dark:text-gray-100">联系管理员</p>
+                          <p class="text-xs text-gray-600 dark:text-gray-400">如需创建账号，请通过邮件联系系统管理员</p>
+                        </div>
+                      </div>
+
+                      <div
+                        class={`flex items-start gap-3 rounded-lg border border-gray-200/50 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-800/50 p-4 backdrop-blur-sm transition-colors hover:border-purple-500/20 hover:bg-gray-100/80 dark:hover:bg-gray-700/80 ${mounted() ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-5'} transition-all duration-500 delay-400`}
+                      >
+                        <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/30">
+                          <svg
+                            class="h-4 w-4 text-purple-600 dark:text-purple-400"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                            />
+                          </svg>
+                        </div>
+                        <div class="flex-1 space-y-1">
+                          <p class="text-sm font-medium text-gray-900 dark:text-gray-100">已有账号？</p>
+                          <p class="text-xs text-gray-600 dark:text-gray-400">如果您已有账号，请直接登录使用系统功能</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 装饰性分隔线 */}
+                    <div class="relative">
+                      <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-200/50 dark:border-gray-700/50" />
+                      </div>
+                      <div class="relative flex justify-center">
+                        <span class="bg-white dark:bg-gray-800 px-4 text-xs text-gray-500 dark:text-gray-400">
+                          感谢您的理解
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </Show>
               </CardContent>
 
               <CardFooter class="flex flex-col space-y-3 sm:space-y-4 px-4 sm:px-6 pb-5 sm:pb-8 pt-2">
-                <div class="relative w-full">
-                  <div class="absolute inset-0 flex items-center">
-                    <div class="w-full border-t border-gray-200 dark:border-gray-700" />
+                <Show
+                  when={registrationEnabled}
+                  fallback={
+                    <div
+                      class={`w-full space-y-3 ${mounted() ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'} transition-all duration-500 delay-500`}
+                    >
+                      <A href="/login" class="block w-full">
+                        <Button class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 font-medium shadow-lg shadow-blue-500/30 transition-all hover:shadow-xl hover:shadow-blue-500/40">
+                          <span class="group inline-flex items-center">
+                            <span class="mr-2 transition-transform group-hover:-translate-x-1">←</span>
+                            返回登录
+                          </span>
+                        </Button>
+                      </A>
+                      <p class="text-center text-xs text-gray-600 dark:text-gray-400">使用现有账号登录系统</p>
+                    </div>
+                  }
+                >
+                  <div class="relative w-full">
+                    <div class="absolute inset-0 flex items-center">
+                      <div class="w-full border-t border-gray-200 dark:border-gray-700" />
+                    </div>
                   </div>
-                </div>
-                <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 text-center">
-                  已有账户？{' '}
-                  <A
-                    href="/login"
-                    class="text-purple-600 hover:text-purple-500 dark:text-purple-400 dark:hover:text-purple-300 font-semibold transition-colors"
-                  >
-                    立即登录
-                  </A>
-                </p>
+                  <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 text-center">
+                    已有账户？{' '}
+                    <A
+                      href="/login"
+                      class="text-purple-600 hover:text-purple-500 dark:text-purple-400 dark:hover:text-purple-300 font-semibold transition-colors"
+                    >
+                      立即登录
+                    </A>
+                  </p>
+                </Show>
               </CardFooter>
             </Card>
 
@@ -627,6 +754,17 @@ export default function Register() {
               .animate-arrow {
                 display: inline-block;
                 animation: arrow 1.5s ease-in-out infinite;
+              }
+              @keyframes spin-slow {
+                from {
+                  transform: rotate(0deg);
+                }
+                to {
+                  transform: rotate(360deg);
+                }
+              }
+              .animate-spin-slow {
+                animation: spin-slow 20s linear infinite;
               }
             `}</style>
           </div>
